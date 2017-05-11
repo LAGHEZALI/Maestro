@@ -1,304 +1,109 @@
 <!DOCTYPE html>
 <html>
-<head>
-<meta name="viewport" charset="utf-8" content="width=device-width, initial-scale=1.0"/>
-<style>
-canvas {
-    border:2px solid #000;
-    background-color: #222;
-}
-</style>
-</head>
-<body onload="startGame()">
-
-<h1 id="note-label">Note : </h1>
-
-<input type="button" onclick="playMusic()" value="PLAY"/>
-
- <select id="mesChansons" >
-  <option value="-1">Choisissez une Chanson</option>
-  <option value="0">Row Row Row</option>
-  <option value="1">Alphabet</option>
-</select> 
-
-<h1 id="chansonEnCours"></h1>
-<p id="notesChansonEnCours" ></p>
-
-<script>
-
-//  Creation de la plateforme
-var myGamePiece;
-//  Creation du son
-var mySound;
-//  Chargement des données
-var data ;
-loadData();
-
-function startGame() {
-
-    touche_do = new component(100, 500, "black", 100, 50, "sounds/do.wav", "Do");
-    touche_re = new component(100, 500, "white", 200, 50, "sounds/re.wav", "Ré");
-    touche_mi = new component(100, 500, "black", 300, 50, "sounds/mi.wav", "Mi");
-    touche_fa = new component(100, 500, "white", 400, 50, "sounds/fa.wav", "Fa");
-    touche_sol= new component(100, 500, "black", 500, 50, "sounds/sol.wav", "Sol");
-    touche_la = new component(100, 500, "white", 600, 50, "sounds/la.wav", "La");
-    touche_si = new component(100, 500, "black", 700, 50, "sounds/si.wav", "Si");
-    touche_do2= new component(100, 500, "white", 800, 50, "sounds/do2.wav", "Do");
-
-    myGameArea.start();
-}
-
-var myGameArea = {
-    canvas : document.createElement("canvas"),
-    start : function() {
-        this.canvas.width = 1000;
-        this.canvas.height = 600;
-        this.canvas.tabIndex = 1;this.canvas.of
-        this.context = this.canvas.getContext("2d");
-        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
-        this.frameNo = 0;
-        //  Creer les touches du piano
-        drawPiano();
-        //  Ecrire les notes correspondentes
-        writeNotesNames();
-        //  Actualisé piano pour detecter un evenement
-        this.interval = setInterval(updatePiano, 50);
-        //  Les écouteurs de clavier physique
-        window.addEventListener('keydown', function (e) {
-            e.preventDefault();
-            myGameArea.keys = (myGameArea.keys || []);
-            myGameArea.keys[e.keyCode] = (e.type == "keydown");
-        })
-        window.addEventListener('keyup', function (e) {
-            myGameArea.keys[e.keyCode] = (e.type == "keydown");            
-        })
-        //  Les écouteurs de la souris
-        window.addEventListener('mousedown', function (e) {
-            myGameArea.x = e.pageX;
-            myGameArea.y = e.pageY;
-        })
-        window.addEventListener('mouseup', function (e) {
-            myGameArea.x = false;
-            myGameArea.y = false;
-        })
-        window.addEventListener('touchstart', function (e) {
-            myGameArea.x = e.pageX;
-            myGameArea.y = e.pageY;
-        })
-        window.addEventListener('touchend', function (e) {
-            myGameArea.x = false;
-            myGameArea.y = false;
-        })
-    }
-}
-
-//  L'objet componant
-function component(width, height, color, x, y, noteSound, name) {
-    this.width = width;
-    this.height = height;
-    this.x = x;
-    this.y = y;
-    this.noteSound = noteSound;  
-    this.name = name;  
-    this.create = function(){
-        ctx = myGameArea.context;
-        ctx.fillStyle = color;
-        ctx.fillRect(this.x, this.y, this.width, this.height);
-    }
-    this.pressed = function(){
-        ctx = myGameArea.context;
-        ctx.fillStyle = "yellow";
-        ctx.fillRect(this.x, this.y, this.width, this.height);
-        mySound = new sound(this.noteSound);
-        mySound.play();
-        document.getElementById('note-label').innerHTML = "Touche : "+this.name;
-    }
-    this.released = function(){
-        ctx = myGameArea.context;
-        ctx.fillStyle = color;
-        ctx.fillRect(this.x, this.y, this.width, this.height);
-    }
-    this.clicked = function() {
-        var myleft = this.x;
-        var myright = this.x + (this.width);
-        var mytop = this.y;
-        var mybottom = this.y + (this.height);
-        var clicked = true;
-        if ((mybottom < myGameArea.y) || (mytop > myGameArea.y)
-         || (myright < myGameArea.x) || (myleft > myGameArea.x)) {
-            clicked = false;
+    <head>
+        <meta name="viewport" charset="utf-8" content="width=device-width, initial-scale=1.0"/>
+        <style>
+        canvas {
+            border:2px solid #000;
+            background-color: #222;
         }
-        return clicked;
-    }
-}
+        </style>
+    </head>
 
-//  L'objet Sound
-function sound(src) {
-    this.sound = document.createElement("audio");
-    this.sound.src = src;
-    this.sound.setAttribute("preload", "auto");
-    this.sound.setAttribute("controls", "none");
-    this.sound.style.display = "none";
-    document.body.appendChild(this.sound);
-    this.play = function(){
-        this.sound.play();
-    }
-    this.stop = function(){
-        this.sound.pause();
-    }
-}
+    <body onload="startGame()">
 
-//  Dessiner le piano
-function drawPiano() {
-
-    //  Dessiner les touches
-    touche_do.create(); 
-    touche_re.create(); 
-    touche_mi.create(); 
-    touche_fa.create(); 
-    touche_sol.create();
-    touche_la.create(); 
-    touche_si.create(); 
-    touche_do2.create(); 
-}
-
-//  Ecrire les noms dans note dans le canvas
-function writeNotesNames() {
-
-    ctx = myGameArea.context;
-    ctx.font = "30px Comic Sans MS";
-    ctx.fillStyle = "White";
-    ctx.fillText("Do"   , 130, 585); 
-    ctx.fillText("Ré"   , 230, 585); 
-    ctx.fillText("Mi"   , 330, 585); 
-    ctx.fillText("Fa"   , 430, 585); 
-    ctx.fillText("Sol"  , 530, 585); 
-    ctx.fillText("La"   , 630, 585); 
-    ctx.fillText("Si"   , 730, 585); 
-    ctx.fillText("Do"   , 830, 585); 
-}
-
-//  MAJ du piano en cas d'evenment
-function updatePiano() {
-
-    //  Si quelqun tape une touche au clavier physique
-    if (myGameArea.keys && myGameArea.keys[90]) { touche_do.pressed() }
-        else{ touche_do.released() }
-    if (myGameArea.keys && myGameArea.keys[69]) { touche_re.pressed() }
-        else{ touche_re.released() }
-    if (myGameArea.keys && myGameArea.keys[82]) { touche_mi.pressed() }
-        else{ touche_mi.released() }
-    if (myGameArea.keys && myGameArea.keys[84]) { touche_fa.pressed() }
-        else{ touche_fa.released() }
-    if (myGameArea.keys && myGameArea.keys[89]) { touche_sol.pressed() }
-        else{ touche_sol.released() }
-    if (myGameArea.keys && myGameArea.keys[85]) { touche_la.pressed() }
-        else{ touche_la.released() }
-    if (myGameArea.keys && myGameArea.keys[73]) { touche_si.pressed() }
-        else{ touche_si.released() }
-    if (myGameArea.keys && myGameArea.keys[79]) { touche_do2.pressed() }
-        else{ touche_do2.released() }
-
-    // si quelqun clique ou touche le clavier du piano virtuel
-    if (myGameArea.x && myGameArea.y) {
-        if (touche_do.clicked()) { touche_do.pressed(); }
-        if (touche_re.clicked()) { touche_re.pressed(); }
-        if (touche_mi.clicked()) { touche_mi.pressed(); }
-        if (touche_fa.clicked()) { touche_fa.pressed(); }
-        if (touche_sol.clicked()) { touche_sol.pressed(); }
-        if (touche_la.clicked()) { touche_la.pressed(); }
-        if (touche_si.clicked()) { touche_si.pressed(); }
-        if (touche_do2.clicked()) { touche_do2.pressed(); }
-    }
-}
-
-function playMusic() {
-    var selectedMusic = document.getElementById("mesChansons");
-    var idMusic = selectedMusic.options[selectedMusic.selectedIndex].value;
-
-    var msg1 = "", msg2 = "";
-
-    if( idMusic != -1 ) {
-        for (i in data) {
-            if( idMusic == data[i].id ) {
-                msg1 += data[i].titre;
-
-                for (j in data[i].notes) {
-
-                        playNote( data[i].notes[j].nomNote , data[i].notes[j].silence );
-
-                        msg2 += data[i].notes[j].nomNote +" ";
-                }
-            }
-        }
         
-        document.getElementById("chansonEnCours").innerHTML="Titre : " + msg1+"<br><br>Notes : ";
-        document.getElementById("notesChansonEnCours").innerHTML=msg2;
-    }
-    else {
-        document.getElementById("chansonEnCours").innerHTML="";
-        document.getElementById("notesChansonEnCours").innerHTML="";
-    }
-}
+        <script>
 
-//  Jouer son d'une note avec silence
-function playNote(nomNote,silence) {
+            //  Creation de la plateforme
+            var myGamePiece;
+            //  Creation du son
+            var mySound;
+            //  Chargement des données
+            var data ;
+            loadData();
 
-    if( nomNote == "Do")        { touche_do.pressed(); }
-    else if(nomNote == "Ré" )   { touche_re.pressed(); }
-    else if(nomNote == "Mi" )   { touche_mi.pressed(); }
-    else if(nomNote == "Fa" )   { touche_fa.pressed(); }
-    else if(nomNote == "Sol" )  { touche_sol.pressed();}
-    else if(nomNote == "La" )   { touche_la.pressed(); }
-    else if(nomNote == "Si" )   { touche_si.pressed(); }
-    else if(nomNote == "Do2" )  { touche_do2.pressed();}
-    
-    sleep(500);
-}
+            //  Mode
+            var mode=0; //  0: Mode Libre . 1:Mode Tuto
 
-//  Fonction qui charge la totalité du fichiers JSON contenant les chansons
-function loadData() {
+            var monTuto;
 
-    var xmlhttp = new XMLHttpRequest();
+            //  Fonction qui charge la totalité du fichiers JSON contenant les chansons
+            function loadData() {
 
-    var maChansonObj;
+                var xmlhttp = new XMLHttpRequest();
 
-    xmlhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
+                var maChansonObj;
 
-            maChansonObj = JSON.parse(this.responseText);
-            data = maChansonObj;
+                xmlhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
 
-            var chansonInfos="";    
+                        maChansonObj = JSON.parse(this.responseText);
+                        data = maChansonObj;
 
-            for (i in maChansonObj) {
-                chansonInfos +=  "<br><br><br>id : " + maChansonObj[i].id +
-                                "<br><br>titre : " + maChansonObj[i].titre +
-                                "<br><br>Notes :";
+                        var chansonInfos="";    
 
-                for (j in maChansonObj[i].notes) {
-                    chansonInfos += "<br>-->"+maChansonObj[i].notes[j].nomNote + " "+
-                        maChansonObj[i].notes[j].Silence ;
+                        for (i in maChansonObj) {
+                            chansonInfos +=  "<br><br><br>id : " + maChansonObj[i].id +
+                                            "<br><br>titre : " + maChansonObj[i].titre +
+                                            "<br><br>Notes :";
+
+                            for (j in maChansonObj[i].notes) {
+                                chansonInfos += "<br>-->"+maChansonObj[i].notes[j].nomNote + " "+
+                                    maChansonObj[i].notes[j].Silence ;
+                            }
+                        }
+                    }
+                };
+                xmlhttp.open("GET", "json/music.json", true);
+                xmlhttp.send();
+            }
+
+            function sleep(milliseconds) {
+                var start = new Date().getTime();
+                for (var i = 0; i < 1e7; i++) {
+                    if ((new Date().getTime() - start) > milliseconds){
+                    break;
+                    }
                 }
             }
-        }
-    };
-    xmlhttp.open("GET", "music.json", true);
-    xmlhttp.send();
-}
+        </script>
 
-function sleep(milliseconds) {
-  var start = new Date().getTime();
-  for (var i = 0; i < 1e7; i++) {
-    if ((new Date().getTime() - start) > milliseconds){
-      break;
-    }
-  }
-}
+        <h1 id="note-label">Note : </h1>
 
-</script>
+        <input id="btn-tuto" type="button" onclick="tutoriel()" value="Tutoriel"/>
 
-<script src="jquery-3.2.1.min.js"></script>
+        <select id="mesChansons" >
 
-</body>
+            <option value="-1">Choisissez une Chanson</option>
+
+            <script>
+                alert("Welcome To Maestro");
+                
+                var option="";
+                for (i in data) {
+                            option = "<option value=\"" + data[i].id + "\">" + 
+                                            data[i].titre + "</option>";
+                            document.write(option);
+                        }
+                
+            </script>
+        </select> 
+
+        <h1 id="chansonEnCours"></h1>
+        <p id="notesChansonEnCours" ></p>
+
+
+        <script src="javascript/tutoriel.js"></script>
+        <script src="javascript/tutoObject.js"></script>
+        <script src="javascript/componentObject.js"></script>
+        <script src="javascript/drawPiano.js"></script>
+        <script src="javascript/gameAreaObject.js"></script>
+        <script src="javascript/playMusic.js"></script>
+        <script src="javascript/playNote.js"></script>
+        <script src="javascript/soundObject.js"></script>
+        <script src="javascript/startGame.js"></script>
+        <script src="javascript/updatePiano.js"></script>
+
+    </body>
 </html>
