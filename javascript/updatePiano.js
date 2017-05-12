@@ -1,6 +1,17 @@
 //  MAJ du piano en cas d'evenment
 function updatePiano() {
 
+     x+=1;
+     document.getElementById("test").innerHTML=x;
+     if(x==10){
+         x=0;
+         // Si on est dans le mode demo
+         if(mode==2)
+            maDemo.playCurrent();
+
+     }
+       
+
     //  Si quelqun tape une touche au clavier physique
     if (myGameArea.keys && myGameArea.keys[90]) { touche_do.pressed() }
         else{ touche_do.released() }

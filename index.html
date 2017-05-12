@@ -24,9 +24,12 @@
             loadData();
 
             //  Mode
-            var mode=0; //  0: Mode Libre . 1:Mode Tuto
+            var mode=0; //  0: Mode Libre . 1:Mode Tuto . 1:Mode Démo
 
             var monTuto;
+            var maDemo;
+
+            var x=0;
 
             //  Fonction qui charge la totalité du fichiers JSON contenant les chansons
             function loadData() {
@@ -69,31 +72,40 @@
             }
         </script>
 
-        <h1 id="note-label">Note : </h1>
-
-        <input id="btn-tuto" type="button" onclick="tutoriel()" value="Tutoriel"/>
-
-        <select id="mesChansons" >
-
-            <option value="-1">Choisissez une Chanson</option>
-
-            <script>
-                alert("Welcome To Maestro");
-                
-                var option="";
-                for (i in data) {
-                            option = "<option value=\"" + data[i].id + "\">" + 
-                                            data[i].titre + "</option>";
-                            document.write(option);
-                        }
-                
-            </script>
-        </select> 
-
-        <h1 id="chansonEnCours"></h1>
-        <p id="notesChansonEnCours" ></p>
+        <div style="float:right;width:35%" >
+            <h1 id="note-label">Note : </h1>
 
 
+            <select id="mesChansons" >
+
+                <option value="-1">Choisissez une Chanson</option>
+
+                <script>
+                    alert("Welcome To Maestro");
+                    var option="";
+                    for (i in data) {
+                                option = "<option value=\"" + data[i].id + "\">" + 
+                                                data[i].titre + "</option>";
+                                document.write(option);
+                            }
+                </script>
+            </select> 
+
+            <input id="btn-demo" type="button" onclick="demoClick()" value="Démo"/>
+            <input id="btn-tuto" type="button" onclick="tutoriel()" value="Tutoriel"/>
+            
+            
+
+            <h1 id="mode">Mode : Libre</h1>
+            <h2 id="chansonEnCours"></h2>
+            <p id="notesChansonEnCours" ></p>
+
+            <h2 id="test" ></h2>
+
+        </div>
+
+        <script src="javascript/demo.js"></script>
+        <script src="javascript/demoObject.js"></script>
         <script src="javascript/tutoriel.js"></script>
         <script src="javascript/tutoObject.js"></script>
         <script src="javascript/componentObject.js"></script>

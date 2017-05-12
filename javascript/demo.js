@@ -1,4 +1,4 @@
-function tutoriel() {
+function demoClick() {
 
     if(mode == 0) {
 
@@ -13,15 +13,15 @@ function tutoriel() {
                     msg1 += data[i].titre;
 
                     //  Creation d'un tuto
-                    monTuto = new tuto(data[i].notes);
-                    monTuto.tutoStart();
+                    maDemo = new demoObj    (data[i].notes);
+                    maDemo.demoStart();
 
                     for (j in data[i].notes) {
                             msg2 += data[i].notes[j].nomNote +" ";
                     }
                 }
             }
-            document.getElementById("mode").innerHTML="Mode : Tutoriel";
+            document.getElementById("mode").innerHTML="Mode : Démo";
             document.getElementById("chansonEnCours").innerHTML="Titre : " + msg1+"<br><br>Notes : ";
             document.getElementById("notesChansonEnCours").innerHTML=msg2;
         }
@@ -32,9 +32,8 @@ function tutoriel() {
         }
 
     }
-    else if(mode == 1) {
-        
+    else if(mode == 2) {
 
-        monTuto.tutoEnd();
+        maDemo.demoEnd();
     }
 }

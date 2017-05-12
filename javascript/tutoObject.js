@@ -67,5 +67,9 @@ function tuto(tabNotes) {
         touche_la.color = "white";
         touche_si.color = "black";
         touche_do2.color= "white";
+
+        document.getElementById("mode").innerHTML="Mode : Libre";
+        document.getElementById("chansonEnCours").innerHTML="";
+        document.getElementById("notesChansonEnCours").innerHTML="";
     }
 }
